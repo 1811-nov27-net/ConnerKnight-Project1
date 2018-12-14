@@ -18,6 +18,7 @@ namespace Project0.Library
         bool UpdateUser(Library.User user);
         bool UpdatePizza(Pizza pizza);
         bool UpdateIngredient(Library.Ingredient ingredient);
+
         bool DeleteLocation(Library.Location location);
         bool DeleteLocationId(int locationId);
         bool DeleteUser(Library.User user);
@@ -25,6 +26,7 @@ namespace Project0.Library
         bool DeleteIngredientId(int ingredientId);
         bool DeletePizzaId(int pizzaId);
         bool DeleteOrderId(int orderId);
+
         List<Library.Ingredient> GetIngredients();
         Library.Ingredient GetIngredient(int ingredientId);
         Library.Location GetLocation(int locationId);

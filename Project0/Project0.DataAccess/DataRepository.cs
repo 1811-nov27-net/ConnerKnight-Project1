@@ -43,6 +43,7 @@ namespace Project0.DataAccess
             if (user != null)
             {
                 db.Remove(user);
+                db.SaveChanges();
                 return true;
             }
             return false;
@@ -52,21 +53,20 @@ namespace Project0.DataAccess
 
         public void AddLocation(Library.Location location)
         {
-            Location l = Mapper.Map(location);
+            Location l = getNewLocation(location);
             db.Add(l);
             db.SaveChanges();
-            foreach(var pair in location.Inventory)
-            {
-                Ingredient i = db.Ingredient.First(a => a.Name == pair.Key.Name);
-                if(i == null)
-                {
-                    i = new Ingredient() { Name = pair.Key.Name };
-                }
-                l.Locationingredient.Add(new Locationingredient() { Ingredient = i, Location = l, Quantity = pair.Value });
+            //foreach(var pair in location.Inventory)
+            //{
+            //    Ingredient i = db.Ingredient.First(a => a.Name == pair.Key.Name);
+            //    if(i == null)
+            //    {
+            //        i = new Ingredient() { Name = pair.Key.Name };
+            //    }
+            //    l.Locationingredient.Add(new Locationingredient() { Ingredient = i, Location = l, Quantity = pair.Value });
                 
-            }
+            //}
             location.LocationId = l.LocationId;
-            db.SaveChanges();
         }
 
         private Location getNewLocation(Library.Location location)
@@ -97,6 +97,7 @@ namespace Project0.DataAccess
             if(location != null)
             {
                 db.Remove(location);
+                db.SaveChanges();
                 return true;
             }
             return false;
@@ -107,10 +108,7 @@ namespace Project0.DataAccess
         public void AddOrder(Library.Order order)
         {
 
-            //Console.WriteLine("size of contents: " + order.Contents.Count);
             Library.OrderManager.PlaceOrder(order,GetUserOrderHistory(order.User));
-            //dont know if this will work
-
             User u = db.User.Find(order.User.UserId);
             Location l = db.Location.Find(order.Location.LocationId);
             //Console.WriteLine("the real pepperoni" + order.Location.Inventory[order.Location.Inventory.Keys.Where(a => a.Name == "Pepperoni").First()]);
@@ -131,6 +129,7 @@ namespace Project0.DataAccess
             db.Order.Add(o);
 
             db.SaveChanges();
+            order.OrderId = o.OrderId;
             
             //db.Add(Mapper.Map(order));
         }
@@ -252,7 +251,10 @@ namespace Project0.DataAccess
 
         public void AddIngredient(Library.Ingredient ingredient)
         {
-            db.Ingredient.Add(new Ingredient { Name = ingredient.Name});
+            Ingredient i = new Ingredient { Name = ingredient.Name };
+            db.Ingredient.Add(i);
+            db.SaveChanges();
+            ingredient.IngredientId = i.IngredientId;
         }
 
         public void AddPizza(Pizza pizza)
@@ -293,7 +295,8 @@ namespace Project0.DataAccess
             var temp = db.Ingredient.Find(ingredient.IngredientId);
             if (temp != null)
             {
-                db.Entry(temp).CurrentValues.SetValues(new Ingredient { Name = ingredient.Name });
+                db.Entry(temp).CurrentValues.SetValues(new Ingredient {IngredientId = ingredient.IngredientId, Name = ingredient.Name });
+                db.SaveChanges();
                 return true;
             }
             return false;
@@ -305,6 +308,7 @@ namespace Project0.DataAccess
             if (ingredient != null)
             {
                 db.Ingredient.Remove(ingredient);
+                db.SaveChanges();
                 return true;
             }
             return false;
@@ -316,6 +320,7 @@ namespace Project0.DataAccess
             if(pizza != null)
             {
                 db.Content.Remove(pizza);
+                db.SaveChanges();
                 return true;
             }
             return false;
@@ -327,6 +332,7 @@ namespace Project0.DataAccess
             if(order != null)
             {
                 db.Order.Remove(order);
+                db.SaveChanges();
                 return true;
             }
             return false;
@@ -355,7 +361,8 @@ namespace Project0.DataAccess
             var temp = db.Location.Find(location.LocationId);
             if(temp != null)
             {
-                db.Entry(temp).CurrentValues.SetValues(getNewLocation(location));
+                db.Entry(temp).CurrentValues.SetValues(getNewLocation(location).LocationId = location.LocationId);
+                db.SaveChanges();
                 return true;
             }
             return false;
@@ -366,7 +373,8 @@ namespace Project0.DataAccess
             var temp = db.User.Find(user.UserId);
             if (temp != null)
             {
-                db.Entry(temp).CurrentValues.SetValues(getNewUser(user));
+                db.Entry(temp).CurrentValues.SetValues(getNewUser(user).UserId = user.UserId);
+                db.SaveChanges();
                 return true;
             }
             return false;
@@ -377,7 +385,8 @@ namespace Project0.DataAccess
             var temp = db.Content.Find(pizza.PizzaId);
             if(temp != null)
             {
-                db.Entry(temp).CurrentValues.SetValues(GetNewContent(pizza));
+                db.Entry(temp).CurrentValues.SetValues(GetNewContent(pizza).ContentId = pizza.PizzaId);
+                db.SaveChanges();
                 return true;
             }
             return false;

@@ -59,19 +59,24 @@ namespace Project0.WebApp.Controllers
         // GET: Ingredient/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            return View(Repo.GetIngredient(id));
         }
 
         // POST: Ingredient/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id,Ingredient ingredient)
         {
             try
             {
-                // TODO: Add update logic here
+                ingredient.IngredientId = id;
+                if (Repo.UpdateIngredient(ingredient))
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                //if get here then the ingredient wasn't found
+                return View();
 
-                return RedirectToAction(nameof(Index));
             }
             catch
             {
