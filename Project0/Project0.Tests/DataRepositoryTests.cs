@@ -14,14 +14,14 @@ namespace Project0.Tests
         public void SavingChangesWithNothingDoesntThrowException()
         {
             // arrange
-            var options = new DbContextOptionsBuilder<Project0Context>().UseInMemoryDatabase("no_changes_test").Options;
-            using (var db = new Project0Context(options))
+            var options = new DbContextOptionsBuilder<Project1Context>().UseInMemoryDatabase("no_changes_test").Options;
+            using (var db = new Project1Context(options))
             {
                 //nothing
             }
 
             // act
-            using (var db = new Project0Context(options))
+            using (var db = new Project1Context(options))
             {
                 var repo = new DataRepository(db);
                 repo.Save();
@@ -35,9 +35,9 @@ namespace Project0.Tests
         public void GetUsersWorks()
         {
             // arrange
-            var options = new DbContextOptionsBuilder<Project0Context>().UseInMemoryDatabase("get_users_test").Options;
+            var options = new DbContextOptionsBuilder<Project1Context>().UseInMemoryDatabase("get_users_test").Options;
 
-            using (var db = new Project0Context(options))
+            using (var db = new Project1Context(options))
             {
                 db.User.Add(new DataAccess.User { FirstName = "a", LastName = "b" });
                 db.User.Add(new DataAccess.User { FirstName = "c", LastName = "d"});
@@ -46,7 +46,7 @@ namespace Project0.Tests
             }
 
             List<Library.User> users = new List<Library.User>();
-            using (var db = new Project0Context(options))
+            using (var db = new Project1Context(options))
             {
                 //nothing
                 var repo = new DataRepository(db);
@@ -63,9 +63,9 @@ namespace Project0.Tests
         public void GetLocationsWorks()
         {
             // arrange
-            var options = new DbContextOptionsBuilder<Project0Context>().UseInMemoryDatabase("get_locations_test").Options;
+            var options = new DbContextOptionsBuilder<Project1Context>().UseInMemoryDatabase("get_locations_test").Options;
 
-            using (var db = new Project0Context(options))
+            using (var db = new Project1Context(options))
             {
                 db.Location.Add(new DataAccess.Location { Name = "a"});
                 db.Location.Add(new DataAccess.Location { Name = "b"});
@@ -74,7 +74,7 @@ namespace Project0.Tests
             }
 
             List<Library.Location> locations = new List<Library.Location>();
-            using (var db = new Project0Context(options))
+            using (var db = new Project1Context(options))
             {
                 //nothing
                 var repo = new DataRepository(db);

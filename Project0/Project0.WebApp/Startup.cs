@@ -36,7 +36,7 @@ namespace Project0.WebApp
 
             services.AddScoped<IDataRepository, DataRepository>();
 
-            services.AddDbContext<Project0Context>(optionsBuilder =>
+            services.AddDbContext<Project1Context>(optionsBuilder =>
                 optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DB")));
 
 

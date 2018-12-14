@@ -9,9 +9,9 @@ namespace Project0.DataAccess
 {
     public class DataRepository : IDataRepository
     {
-        private readonly Project0Context db;
+        private readonly Project1Context db;
 
-        public DataRepository(Project0Context _db)
+        public DataRepository(Project1Context _db)
         {
             db = _db ?? throw new ArgumentNullException(nameof(_db));
         }
@@ -26,13 +26,26 @@ namespace Project0.DataAccess
 
         }
 
-        public void DeleteUser(Library.User user)
+        private User getNewUser(Library.User user)
         {
-            DeleteUserId(user.UserId);
+            User u = Mapper.Map(user);
+            u.DefaultLocation = db.Location.Find(user.DefaultLocation.LocationId);
+            return u;
         }
-        public void DeleteUserId(int userId)
+
+        public bool DeleteUser(Library.User user)
         {
-            db.Remove(db.User.Find(userId));
+            return DeleteUserId(user.UserId);
+        }
+        public bool DeleteUserId(int userId)
+        {
+            User user = db.User.Find(userId);
+            if (user != null)
+            {
+                db.Remove(user);
+                return true;
+            }
+            return false;
         }
 
         //public void UpdateUser()
@@ -56,14 +69,38 @@ namespace Project0.DataAccess
             db.SaveChanges();
         }
 
-        public void DeleteLocation(Library.Location location)
+        private Location getNewLocation(Library.Location location)
         {
-            DeleteLocationId(location.LocationId);
+            Location newLoc = Mapper.Map(location);
+            foreach (var pair in location.Inventory)
+            {
+                Ingredient i = db.Ingredient.Find(pair.Key.IngredientId);
+                //probably shouldnt do this
+                if (i == null)
+                {
+                    i = new Ingredient() { Name = pair.Key.Name };
+                }
+                newLoc.Locationingredient.Add(new Locationingredient() { Ingredient = i, Location = newLoc, Quantity = pair.Value });
+
+            }
+            return newLoc;
         }
 
-        public void DeleteLocationId(int locationId)
+        public bool DeleteLocation(Library.Location location)
         {
-            db.Remove(db.Location.Find(locationId));
+            return DeleteLocationId(location.LocationId);
+        }
+
+        public bool DeleteLocationId(int locationId)
+        {
+            var location = db.Location.Find(locationId);
+            if(location != null)
+            {
+                db.Remove(location);
+                return true;
+            }
+            return false;
+            
         }
 
 
@@ -86,7 +123,7 @@ namespace Project0.DataAccess
                 Content c = db.Content.Where(a => a.Name == pair.Key.Name).First();
                 if(c == null)
                 {
-                    c = new Content() { Name=pair.Key.Name,Price= pair.Key.Price};
+                    c = new Content() { Name=pair.Key.Name,Price = pair.Key.Price};
                 }
                 o.OrderContent.Add(new OrderContent() { Order=o,Content=c,Amount=pair.Value});
 
@@ -152,7 +189,7 @@ namespace Project0.DataAccess
                 {
                     reqIng.Add(new Library.Ingredient() { Name = i.Ingredient.Name, IngredientId = i.Ingredient.IngredientId });
                 }
-                result.Add(new Pizza() { Name = c.Name, Price = c.Price, PizzaId = c.ContentId,RequiredIng= reqIng });
+                result.Add(new Pizza() { Name = c.Name, PizzaId = c.ContentId,RequiredIng= reqIng,Price=c.Price });
             }
             return result;
             //return db.Content.Select(a => new Library.Pizza() { Name = a.Name, Price = a.Price ?? 0 }).ToList();
@@ -197,7 +234,7 @@ namespace Project0.DataAccess
                 Dictionary<Pizza, int> pizzas = new Dictionary<Pizza, int>();
                 foreach (OrderContent oc in o.OrderContent)
                 {
-                    Pizza p = new Pizza() { Name = oc.Content.Name, Price = oc.Content.Price};
+                    Pizza p = new Pizza() { Name = oc.Content.Name,Price=oc.Content.Price};
                     pizzas[p] = oc.Amount;
                 }
 
@@ -220,26 +257,130 @@ namespace Project0.DataAccess
 
         public void AddPizza(Pizza pizza)
         {
-            db.Content.Add(new Content {
+            //List<ContentIngredient> col = new List<ContentIngredient>();
+            //foreach(var i in pizza.RequiredIng)
+            //{
+            //    var temp = db.Ingredient.Find(i.IngredientId);
+            //    col.Add(new ContentIngredient { Ingredient = temp });
+            //}
+            Content c = GetNewContent(pizza);
+            db.Content.Add(c);
+            db.SaveChanges();
+            pizza.PizzaId = c.ContentId;
+
+        }
+
+        private Content GetNewContent(Pizza pizza)
+        {
+            List<ContentIngredient> col = new List<ContentIngredient>();
+            foreach (var i in pizza.RequiredIng)
+            {
+                var temp = db.Ingredient.Find(i.IngredientId);
+                col.Add(new ContentIngredient { Ingredient = temp });
+            }
+
+            return new Content
+            {
                 Name = pizza.Name,
-                
-                
-            });
+                Price = pizza.Price,
+                ContentIngredient = col
+            };
         }
 
-        public void DeleteIngredientId(int ingredientId)
+        public bool UpdateIngredient(Library.Ingredient ingredient)
         {
-            throw new NotImplementedException();
+            //_db.Entry(_db.Restaurant.Find(restaurant.Id)).CurrentValues.SetValues(Mapper.Map(restaurant));
+            var temp = db.Ingredient.Find(ingredient.IngredientId);
+            if (temp != null)
+            {
+                db.Entry(temp).CurrentValues.SetValues(new Ingredient { Name = ingredient.Name });
+                return true;
+            }
+            return false;
         }
 
-        public void DeletePizzaId(int pizzaId)
+        public bool DeleteIngredientId(int ingredientId)
         {
-            throw new NotImplementedException();
+            var ingredient = db.Ingredient.Find(ingredientId);
+            if (ingredient != null)
+            {
+                db.Ingredient.Remove(ingredient);
+                return true;
+            }
+            return false;
         }
 
-        public void DeleteOrderId(int orderId)
+        public bool DeletePizzaId(int pizzaId)
         {
-            throw new NotImplementedException();
+            var pizza = db.Content.Find(pizzaId);
+            if(pizza != null)
+            {
+                db.Content.Remove(pizza);
+                return true;
+            }
+            return false;
+        }
+
+        public bool DeleteOrderId(int orderId)
+        {
+            var order = db.Order.Find(orderId);
+            if(order != null)
+            {
+                db.Order.Remove(order);
+                return true;
+            }
+            return false;
+        }
+
+        public Library.Ingredient GetIngredient(int ingredientId)
+        {
+            var temp = db.Ingredient.Find(ingredientId);
+            return new Library.Ingredient { IngredientId = temp.IngredientId, Name = temp.Name };
+        }
+
+        public Pizza GetPizza(int pizzaId)
+        {
+            var temp = db.Content.Find(pizzaId);
+            List<Library.Ingredient> reqIng = new List<Library.Ingredient>();
+            foreach (var i in temp.ContentIngredient)
+            {
+                reqIng.Add(new Library.Ingredient() { Name = i.Ingredient.Name, IngredientId = i.Ingredient.IngredientId });
+            }
+            return new Pizza() { Name = temp.Name, PizzaId = temp.ContentId, RequiredIng = reqIng, Price = temp.Price };
+        }
+
+        public bool UpdateLocation(Library.Location location)
+        {
+            ////_db.Entry(_db.Restaurant.Find(restaurant.Id)).CurrentValues.SetValues(Mapper.Map(restaurant));
+            var temp = db.Location.Find(location.LocationId);
+            if(temp != null)
+            {
+                db.Entry(temp).CurrentValues.SetValues(getNewLocation(location));
+                return true;
+            }
+            return false;
+        }
+
+        public bool UpdateUser(Library.User user)
+        {
+            var temp = db.User.Find(user.UserId);
+            if (temp != null)
+            {
+                db.Entry(temp).CurrentValues.SetValues(getNewUser(user));
+                return true;
+            }
+            return false;
+        }
+
+        public bool UpdatePizza(Pizza pizza)
+        {
+            var temp = db.Content.Find(pizza.PizzaId);
+            if(temp != null)
+            {
+                db.Entry(temp).CurrentValues.SetValues(GetNewContent(pizza));
+                return true;
+            }
+            return false;
         }
     }
 }

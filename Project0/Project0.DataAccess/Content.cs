@@ -8,7 +8,7 @@ namespace Project0.DataAccess
         public Content()
         {
             ContentIngredient = new HashSet<ContentIngredient>();
-            ContentSize = new HashSet<ContentSize>();
+            //ContentSize = new HashSet<ContentSize>();
             OrderContent = new HashSet<OrderContent>();
         }
 
@@ -16,8 +16,10 @@ namespace Project0.DataAccess
         public string Name { get; set; }
         public decimal Price { get; set; }
 
+
+
         public virtual ICollection<ContentIngredient> ContentIngredient { get; set; }
-        public virtual ICollection<ContentSize> ContentSize { get; set; }
+        //public virtual ICollection<ContentSize> ContentSize { get; set; }
         public virtual ICollection<OrderContent> OrderContent { get; set; }
     }
 }

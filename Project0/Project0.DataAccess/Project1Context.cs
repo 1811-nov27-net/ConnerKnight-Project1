@@ -4,20 +4,19 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Project0.DataAccess
 {
-    public partial class Project0Context : DbContext
+    public partial class Project1Context : DbContext
     {
-        public Project0Context()
+        public Project1Context()
         {
         }
 
-        public Project0Context(DbContextOptions<Project0Context> options)
+        public Project1Context(DbContextOptions<Project1Context> options)
             : base(options)
         {
         }
 
         public virtual DbSet<Content> Content { get; set; }
         public virtual DbSet<ContentIngredient> ContentIngredient { get; set; }
-        public virtual DbSet<ContentSize> ContentSize { get; set; }
         public virtual DbSet<Ingredient> Ingredient { get; set; }
         public virtual DbSet<Location> Location { get; set; }
         public virtual DbSet<Locationingredient> Locationingredient { get; set; }
@@ -27,6 +26,7 @@ namespace Project0.DataAccess
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,7 +37,9 @@ namespace Project0.DataAccess
             {
                 entity.ToTable("Content", "PZ");
 
-                entity.Property(e => e.Name).HasMaxLength(100);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.Price).HasColumnType("money");
             });
@@ -51,33 +53,12 @@ namespace Project0.DataAccess
                 entity.HasOne(d => d.Content)
                     .WithMany(p => p.ContentIngredient)
                     .HasForeignKey(d => d.ContentId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ContentIngredientContent");
 
                 entity.HasOne(d => d.Ingredient)
                     .WithMany(p => p.ContentIngredient)
                     .HasForeignKey(d => d.IngredientId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ContentIngredientIngredient");
-            });
-
-            modelBuilder.Entity<ContentSize>(entity =>
-            {
-                entity.HasKey(e => new { e.ContentId, e.Size });
-
-                entity.ToTable("ContentSize", "PZ");
-
-                entity.Property(e => e.Size).HasMaxLength(100);
-
-                entity.Property(e => e.PriceMod)
-                    .HasColumnType("money")
-                    .HasDefaultValueSql("((0))");
-
-                entity.HasOne(d => d.Content)
-                    .WithMany(p => p.ContentSize)
-                    .HasForeignKey(d => d.ContentId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_ContentSizeContent");
             });
 
             modelBuilder.Entity<Ingredient>(entity =>
@@ -108,13 +89,11 @@ namespace Project0.DataAccess
                 entity.HasOne(d => d.Ingredient)
                     .WithMany(p => p.Locationingredient)
                     .HasForeignKey(d => d.IngredientId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_LocationIngredientIngredient");
 
                 entity.HasOne(d => d.Location)
                     .WithMany(p => p.Locationingredient)
                     .HasForeignKey(d => d.LocationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_LocationIngredientLocation");
             });
 
@@ -125,13 +104,13 @@ namespace Project0.DataAccess
                 entity.HasOne(d => d.Location)
                     .WithMany(p => p.Order)
                     .HasForeignKey(d => d.LocationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("FK_OrderLocation");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Order)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("FK_OrderUser");
             });
 
@@ -144,13 +123,11 @@ namespace Project0.DataAccess
                 entity.HasOne(d => d.Content)
                     .WithMany(p => p.OrderContent)
                     .HasForeignKey(d => d.ContentId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_OrderContentContent");
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderContent)
                     .HasForeignKey(d => d.OrderId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_OrderContentOrder");
             });
 
@@ -158,13 +135,16 @@ namespace Project0.DataAccess
             {
                 entity.ToTable("User", "PZ");
 
-                entity.Property(e => e.FirstName).HasMaxLength(100);
+                entity.Property(e => e.FirstName)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.LastName).HasMaxLength(100);
 
                 entity.HasOne(d => d.DefaultLocation)
                     .WithMany(p => p.User)
                     .HasForeignKey(d => d.DefaultLocationId)
+                    .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("FK_UserLocation");
             });
         }
