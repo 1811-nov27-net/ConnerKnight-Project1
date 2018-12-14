@@ -7,8 +7,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Project0.DataAccess;
+using Project0.Library;
 
 namespace Project0.WebApp
 {
@@ -30,6 +33,11 @@ namespace Project0.WebApp
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+
+            services.AddScoped<IDataRepository, DataRepository>();
+
+            services.AddDbContext<Project0Context>(optionsBuilder =>
+                optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DB")));
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

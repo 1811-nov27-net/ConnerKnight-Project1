@@ -18,7 +18,6 @@ namespace Project0.Library
         public Dictionary<Ingredient, int> Inventory { get; set; }
         //made it so only pizzas could be ordered
         public List<Pizza> Menu { get; set; }
-        public List<Order> OrderHistory { get; set; }
 
         //wouldn't even conceivably ever use this constructor, doesn't make sense
         /*
@@ -36,28 +35,24 @@ namespace Project0.Library
             Name = name;
             Inventory = inventory;
             Menu = menu;
-            OrderHistory = new List<Order>();
         }
         public Location(string name, List<Pizza> menu)
         {
             Name = name;
             Menu = menu;
             Inventory = new Dictionary<Ingredient, int>();
-            OrderHistory = new List<Order>();
         }
         public Location(string name, Dictionary<Ingredient, int> inventory)
         {
             Name = name;
             Menu = new List<Pizza>();
             Inventory = inventory;
-            OrderHistory = new List<Order>();
         }
         public Location(string name)
         {
             Name = name;
             Inventory = new Dictionary<Ingredient, int>();
             Menu = new List<Pizza>();
-            OrderHistory = new List<Order>();
         }
 
         //not necesary if not using XML
@@ -67,7 +62,6 @@ namespace Project0.Library
             Name = null;
             Inventory = new Dictionary<Ingredient, int>();
             Menu = new List<Pizza>();
-            OrderHistory = new List<Order>();
         }
         
         /// <summary>
@@ -82,7 +76,6 @@ namespace Project0.Library
                 //Console.WriteLine(pair.Value);
                 Inventory[pair.Key] = Inventory[pair.Key] - pair.Value;
             }
-            //OrderHistory.Add(o);
         }
 
        

@@ -11,9 +11,9 @@ namespace Project0.DataAccess
         }
 
         public int OrderId { get; set; }
-        public int? LocationId { get; set; }
-        public int? UserId { get; set; }
-        public DateTime? OrderTime { get; set; }
+        public int LocationId { get; set; }
+        public int UserId { get; set; }
+        public DateTime OrderTime { get; set; }
 
         public virtual Location Location { get; set; }
         public virtual User User { get; set; }

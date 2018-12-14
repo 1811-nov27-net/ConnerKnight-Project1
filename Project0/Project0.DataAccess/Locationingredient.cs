@@ -7,7 +7,7 @@ namespace Project0.DataAccess
     {
         public int IngredientId { get; set; }
         public int LocationId { get; set; }
-        public int? Quantity { get; set; }
+        public int Quantity { get; set; }
 
         public virtual Ingredient Ingredient { get; set; }
         public virtual Location Location { get; set; }

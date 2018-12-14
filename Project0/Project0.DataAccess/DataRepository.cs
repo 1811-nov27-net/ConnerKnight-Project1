@@ -7,7 +7,7 @@ using Project0.Library;
 
 namespace Project0.DataAccess
 {
-    public class DataRepository : Library.IDataRepository
+    public class DataRepository : IDataRepository
     {
         private readonly Project0Context db;
 
@@ -28,7 +28,11 @@ namespace Project0.DataAccess
 
         public void DeleteUser(Library.User user)
         {
-            db.Remove(db.User.Find(user.UserId));
+            DeleteUserId(user.UserId);
+        }
+        public void DeleteUserId(int userId)
+        {
+            db.Remove(db.User.Find(userId));
         }
 
         //public void UpdateUser()
@@ -54,7 +58,12 @@ namespace Project0.DataAccess
 
         public void DeleteLocation(Library.Location location)
         {
-            db.Remove(db.Location.Find(location.LocationId));
+            DeleteLocationId(location.LocationId);
+        }
+
+        public void DeleteLocationId(int locationId)
+        {
+            db.Remove(db.Location.Find(locationId));
         }
 
 
@@ -89,9 +98,9 @@ namespace Project0.DataAccess
             //db.Add(Mapper.Map(order));
         }
 
-        public Library.User GetUser(string firstName, string lastName)
+        public Library.User GetUser(int userId)
         {
-            return Mapper.Map(db.User.Where(a => a.FirstName == firstName && a.LastName == lastName).First());
+            return Mapper.Map(db.User.First(a => a.UserId == userId));
         }
 
         public List<Library.User> GetUsers()
@@ -100,13 +109,14 @@ namespace Project0.DataAccess
             return users.Select(a => Mapper.Map(a)).ToList();
         }
 
-        public Library.Location GetLocation(string name)
+
+        public Library.Location GetLocation(int locationId)
         {
-            Location l = db.Location.Include("Locationingredient.Ingredient").Where(a => a.Name == name).First();
+            Location l = db.Location.Include("Locationingredient.Ingredient").Where(a => a.LocationId == locationId).First();
             Dictionary<Library.Ingredient, int> tempInventory = new Dictionary<Library.Ingredient, int>();
             foreach (var i in l.Locationingredient)
             {
-                tempInventory[Mapper.Map(i.Ingredient)] = i.Quantity ?? 0;
+                tempInventory[Mapper.Map(i.Ingredient)] = i.Quantity;
             }
             return new Library.Location() { LocationId = l.LocationId, Name = l.Name, Inventory = tempInventory };
 
@@ -121,7 +131,7 @@ namespace Project0.DataAccess
                 Dictionary<Library.Ingredient, int> tempInventory = new Dictionary<Library.Ingredient, int>();
                 foreach(var i in l.Locationingredient)
                 {
-                    tempInventory[Mapper.Map(i.Ingredient)] = i.Quantity ?? 0;
+                    tempInventory[Mapper.Map(i.Ingredient)] = i.Quantity;
                 }
                 Library.Location temp = new Library.Location() { LocationId = l.LocationId,Name = l.Name, Inventory = tempInventory };
                 result.Add(temp);
@@ -142,7 +152,7 @@ namespace Project0.DataAccess
                 {
                     reqIng.Add(new Library.Ingredient() { Name = i.Ingredient.Name, IngredientId = i.Ingredient.IngredientId });
                 }
-                result.Add(new Pizza() { Name = c.Name, Price = c.Price ?? 0, PizzaId = c.ContentId,RequiredIng= reqIng });
+                result.Add(new Pizza() { Name = c.Name, Price = c.Price, PizzaId = c.ContentId,RequiredIng= reqIng });
             }
             return result;
             //return db.Content.Select(a => new Library.Pizza() { Name = a.Name, Price = a.Price ?? 0 }).ToList();
@@ -156,15 +166,24 @@ namespace Project0.DataAccess
 
         public List<Library.Order> GetUserOrderHistory(Library.User user)
         {
-            List<Order> os = db.Order.Where(a => a.UserId == user.UserId).Include(a => a.User).Include(b => b.Location).Include("OrderContent.Content").ToList();
+            return GetUserIdOrderHistory(user.UserId);
+        }
+
+        public List<Library.Order> GetUserIdOrderHistory(int userId)
+        {
+            List<Order> os = db.Order.Where(a => a.UserId == userId).Include(a => a.User).Include(b => b.Location).Include("OrderContent.Content").ToList();
             return GetOrderHistory(os);
             
 
         }
-
         public List<Library.Order> GetLocationOrderHistory(Library.Location location)
         {
-            List<Order> os = db.Order.Where(a => a.LocationId == location.LocationId).Include(a => a.User).Include(b => b.Location).Include("OrderContent.Content").ToList();
+            return GetLocationIdOrderHistory(location.LocationId);
+        }
+
+        public List<Library.Order> GetLocationIdOrderHistory(int locationId)
+        {
+            List<Order> os = db.Order.Where(a => a.LocationId == locationId).Include(a => a.User).Include(b => b.Location).Include("OrderContent.Content").ToList();
             return GetOrderHistory(os);
         }
 
@@ -178,11 +197,11 @@ namespace Project0.DataAccess
                 Dictionary<Pizza, int> pizzas = new Dictionary<Pizza, int>();
                 foreach (OrderContent oc in o.OrderContent)
                 {
-                    Pizza p = new Pizza() { Name = oc.Content.Name, Price = oc.Content.Price ?? 0 };
-                    pizzas[p] = oc.Amount ?? 0;
+                    Pizza p = new Pizza() { Name = oc.Content.Name, Price = oc.Content.Price};
+                    pizzas[p] = oc.Amount;
                 }
 
-                Library.Order tempOrder = new Library.Order() { OrderId = o.OrderId,User = u, Location = l, Contents = pizzas, OrderTime = o.OrderTime ?? DateTime.Now };
+                Library.Order tempOrder = new Library.Order() { OrderId = o.OrderId,User = u, Location = l, Contents = pizzas, OrderTime = o.OrderTime };
                 result.Add(tempOrder);
             }
 
@@ -192,6 +211,35 @@ namespace Project0.DataAccess
         public void Save()
         {
             db.SaveChanges();
+        }
+
+        public void AddIngredient(Library.Ingredient ingredient)
+        {
+            db.Ingredient.Add(new Ingredient { Name = ingredient.Name});
+        }
+
+        public void AddPizza(Pizza pizza)
+        {
+            db.Content.Add(new Content {
+                Name = pizza.Name,
+                
+                
+            });
+        }
+
+        public void DeleteIngredientId(int ingredientId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeletePizzaId(int pizzaId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteOrderId(int orderId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -3,13 +3,12 @@ using System.Collections.Generic;
 
 namespace Project0.DataAccess
 {
-    public partial class OrderContent
+    public partial class ContentSize
     {
-        public int OrderId { get; set; }
         public int ContentId { get; set; }
-        public int Amount { get; set; }
+        public string Size { get; set; }
+        public decimal? PriceMod { get; set; }
 
         public virtual Content Content { get; set; }
-        public virtual Order Order { get; set; }
     }
 }

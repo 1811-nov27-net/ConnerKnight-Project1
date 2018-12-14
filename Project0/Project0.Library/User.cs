@@ -7,25 +7,18 @@ namespace Project0.Library
     /// <summary>
     /// represents someone who places Orders at a Location
     /// </summary>
-    public class User : IHistoryable
+    public class User
     {
         public int UserId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public Location DefaultLocation { get; set; }
-        public List<Order> OrderHistory { get; set; }
 
         
         public User()
         {
-            FirstName = null;
-            LastName = null;
-            OrderHistory = new List<Order>();
+
         }
-        
-
-
-        
 
         /// <summary>
         /// constructor to create a new User with given firstName and lastName and an empty OrderHistory
@@ -36,7 +29,6 @@ namespace Project0.Library
         {
             FirstName = firstName;
             LastName = lastName;
-            OrderHistory = new List<Order>();
         }
 
         /// <summary>
