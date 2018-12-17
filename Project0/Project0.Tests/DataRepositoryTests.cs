@@ -158,6 +158,46 @@ namespace Project0.Tests
 
         }
 
+        [Fact]
+        public void UpdateLocationWorks()
+        {
+            // arrange
+            var options = new DbContextOptionsBuilder<Project1Context>().UseInMemoryDatabase("update_location_test").Options;
+
+            using (var db = new Project1Context(options))
+            {
+                Dictionary<Lib.Ingredient,int> ingredients = new Dictionary<Lib.Ingredient,int> { { new Lib.Ingredient { Name = "Orange" } ,3}, { new Lib.Ingredient { Name = "Grape" },5 } };
+                var repo = new DataRepository(db);
+                foreach (var item in ingredients)
+                {
+                    repo.AddIngredient(item.Key);
+                }
+                Lib.Location oldLoc = new Lib.Location { Name = "Fruitya", Inventory = ingredients };
+                repo.AddLocation(oldLoc);
+                oldLoc.Inventory = new Dictionary<Lib.Ingredient, int> { { ingredients.First().Key, 9 } };
+                //Lib.Pizza updatedZa = new Lib.Pizza { Name = "Fruit Pizza", Price = 14.49m, RequiredIng = { ingredients[0] } };
+                repo.UpdateLocation(oldLoc);
+                db.SaveChanges();
+                Lib.Location checkLocation = repo.GetLocation(oldLoc.LocationId);
+                //Assert.Equal(1, checkLocation.Inventory.Count());
+                foreach (var item in oldLoc.Inventory)
+                {
+                    Assert.True(checkLocation.Inventory.ContainsKey(item.Key));
+                    Assert.Equal(item.Value, checkLocation.Inventory[item.Key]);
+                }
+
+            }
+
+            List<Library.Location> locations = new List<Library.Location>();
+            using (var db = new Project1Context(options))
+            {
+                //nothing
+                var repo = new DataRepository(db);
+                locations = repo.GetLocations();
+            }
+
+        }
+
 
     }
 }
