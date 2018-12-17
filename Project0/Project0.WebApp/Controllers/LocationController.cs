@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Project0.Library;
+using Project0.WebApp.Models;
 
 namespace Project0.WebApp.Controllers
 {
@@ -33,21 +34,32 @@ namespace Project0.WebApp.Controllers
         // GET: Location/Create
         public ActionResult Create()
         {
-            return View();
+            return View(new LocationIngredients
+            {
+                Ingredients = Repo.GetIngredients().Select(a => new MultipleIngredient { Ingredient = a, Quantity = 0 }).ToList()
+            });
         }
 
         // POST: Location/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Location location)
+        public ActionResult Create(Location location, List<MultipleIngredient> ingredients)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
+                    Dictionary<Ingredient,int> inventory = new Dictionary<Ingredient,int>();
+                    foreach (var i in ingredients)
+                    {
+                        if (i.Quantity > 0)
+                        {
+                            inventory[i.Ingredient] = i.Quantity;
+                        }
+                    }
+                    location.Inventory = inventory;
                     Repo.AddLocation(location);
                 }
-
                 return RedirectToAction(nameof(Index));
             }
             catch

@@ -223,7 +223,31 @@ namespace Project0.DataAccess
             return GetOrderHistory(os);
         }
 
-        public List<Library.Order> GetOrderHistory(List<Order> os)
+        public List<Library.Order> GetOrderHistory()
+        {
+            return GetOrderHistory(db.Order.Include(a => a.User).Include(b => b.Location).Include("OrderContent.Content").ToList());
+        }
+        public Library.Order GetOrder(int orderId)
+        {
+            Order order = db.Order.Include(a => a.User).Include(b => b.Location).Include("OrderContent.Content").First(o => o.OrderId == orderId);
+            Library.Location l = Mapper.Map(order.Location);
+            Library.User u = Mapper.Map(order.User);
+            Dictionary<Pizza, int> pizzas = new Dictionary<Pizza, int>();
+            foreach (OrderContent oc in order.OrderContent)
+            {
+                Pizza p = new Pizza() { Name = oc.Content.Name, Price = oc.Content.Price };
+                pizzas[p] = oc.Amount;
+            }
+
+            Library.Order result = new Library.Order{
+                OrderId = order.OrderId,
+                User = u, Location = l,
+                Contents = pizzas,
+                OrderTime = order.OrderTime };
+            return result;
+        }
+
+        private List<Library.Order> GetOrderHistory(List<Order> os)
         {
             List<Library.Order> result = new List<Library.Order>();
             foreach (var o in os)
@@ -346,7 +370,7 @@ namespace Project0.DataAccess
 
         public Pizza GetPizza(int pizzaId)
         {
-            var temp = db.Content.Find(pizzaId);
+            var temp = db.Content.Include("ContentIngredient.Ingredient").First(p=> p.ContentId == pizzaId);
             List<Library.Ingredient> reqIng = new List<Library.Ingredient>();
             foreach (var i in temp.ContentIngredient)
             {
@@ -380,16 +404,26 @@ namespace Project0.DataAccess
             return false;
         }
 
+        //something wrong with this update, check it out later
         public bool UpdatePizza(Pizza pizza)
         {
-            var temp = db.Content.Find(pizza.PizzaId);
+            var temp = db.Content.Include("ContentIngredient.Ingredient").First(c => c.ContentId == pizza.PizzaId);
             if(temp != null)
             {
-                db.Entry(temp).CurrentValues.SetValues(GetNewContent(pizza).ContentId = pizza.PizzaId);
+                //old:                 db.Entry(temp).CurrentValues.SetValues(GetNewContent(pizza).ContentId = pizza.PizzaId);
+                Content updated = GetNewContent(pizza);
+                updated.ContentId = pizza.PizzaId;
+                db.Entry(temp).CurrentValues.SetValues(updated);
                 db.SaveChanges();
                 return true;
             }
             return false;
+        }
+
+        public Library.Location GetLocationByName(string name)
+        {
+            Location temp = db.Location.First(a => a.Name == name);
+            return GetLocation(temp.LocationId);
         }
     }
 }

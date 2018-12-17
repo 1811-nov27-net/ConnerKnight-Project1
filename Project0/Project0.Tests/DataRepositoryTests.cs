@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Project0.Library;
+using Lib = Project0.Library;
 using Project0.DataAccess;
 using Xunit;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Project0.Tests
 {
@@ -45,7 +46,7 @@ namespace Project0.Tests
                 db.SaveChanges();
             }
 
-            List<Library.User> users = new List<Library.User>();
+            List<Lib.User> users = new List<Lib.User>();
             using (var db = new Project1Context(options))
             {
                 //nothing
@@ -83,10 +84,43 @@ namespace Project0.Tests
             Assert.Equal("a", locations[0].Name);
             Assert.Equal("b", locations[1].Name);
 
+        }
 
+        [Fact]
+        public void AddLocationsWorks()
+        {
+            // arrange
+            var options = new DbContextOptionsBuilder<Project1Context>().UseInMemoryDatabase("add_locations_test").Options;
+            var i1 = new Lib.Ingredient { Name = "Sausage" };
+            var location = new Lib.Location
+            {
+                Name = "alfo",
+                Inventory = {
+                    { i1, 5}
+                }
+            };
 
-            // assert
-            // (no exception should have been thrown)
+            using (var db = new Project1Context(options))
+            {
+                var repo = new DataRepository(db);
+                repo.AddLocation(location);
+
+                db.SaveChanges();
+            }
+            Location l;
+            using (var db = new Project1Context(options))
+            {
+                //nothing
+                l = db.Location.Include("Locationingredient.Ingredient").Where(a=> a.LocationId == location.LocationId).First();
+
+                
+            }
+            Assert.NotNull(l);
+            Assert.Equal(location.Name, l.Name);
+            //Console.WriteLine(location.Inventory.First().Key.Name);
+            Assert.Equal(location.Inventory.First().Key.Name, l.Locationingredient.First().Ingredient.Name);
+            Assert.Equal(location.Inventory.First().Value, l.Locationingredient.First().Quantity);
+
         }
 
 

@@ -21,6 +21,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Price)
             </th>
+            <th>
+                Ingredients
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -36,10 +39,24 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Price)
             </td>
+
+            <td>
+                @for (int i = 0; i < item.RequiredIng.Count; i++)
+                {
+
+                    @Html.DisplayFor(modelItem => item.RequiredIng[i].Name)
+                    @if(i != item.RequiredIng.Count - 1)
+                    {
+                        @(", ")
+                    }
+
+                }
+            </td>
+            
             <td>
                 @Html.ActionLink("Edit", "Edit", new {  id=item.PizzaId  }) |
-                @Html.ActionLink("Details", "Details", new { id = item.PizzaId }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.PizzaId })
+                @Html.ActionLink("Details", "Details", new { id=item.PizzaId }) |
+                @Html.ActionLink("Delete", "Delete", new { id=item.PizzaId })
             </td>
         </tr>
 }

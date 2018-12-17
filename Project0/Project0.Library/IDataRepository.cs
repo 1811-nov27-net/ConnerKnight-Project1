@@ -30,6 +30,7 @@ namespace Project0.Library
         List<Library.Ingredient> GetIngredients();
         Library.Ingredient GetIngredient(int ingredientId);
         Library.Location GetLocation(int locationId);
+        Library.Location GetLocationByName(string name);
         List<Library.Order> GetLocationOrderHistory(Library.Location location);
         List<Library.Order> GetUserIdOrderHistory(int userId);
         List<Library.Location> GetLocations();
@@ -38,6 +39,8 @@ namespace Project0.Library
         Library.User GetUser(int userId);
         List<Library.Order> GetUserOrderHistory(Library.User user);
         List<Library.Order> GetLocationIdOrderHistory(int locationId);
+        List<Library.Order> GetOrderHistory();
+        Library.Order GetOrder(int orderId);
         List<Library.User> GetUsers();
         void Save();
     }

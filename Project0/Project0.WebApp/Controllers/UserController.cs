@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Project0.Library;
+using Project0.WebApp.Models;
 
 namespace Project0.WebApp.Controllers
 { 
@@ -35,18 +36,20 @@ namespace Project0.WebApp.Controllers
         // GET: User/Create
         public ActionResult Create()
         {
-            return View();
+            return View(new UserLocation { Locations = Repo.GetLocations()});
         }
 
         // POST: User/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(User user)
+        public ActionResult Create(User user,UserLocation userLocation)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
+                    Location location = Repo.GetLocationByName(userLocation.RawLocation);
+                    user.DefaultLocation = location;
                     Repo.AddUser(user);
                 }
                 return RedirectToAction(nameof(Index));
@@ -67,11 +70,14 @@ namespace Project0.WebApp.Controllers
         // POST: User/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(User user)
         {
             try
             {
-                // TODO: Add update logic here
+                if (ModelState.IsValid)
+                {
+                    Repo.UpdateUser(user);
+                }
 
                 return RedirectToAction(nameof(Index));
             }

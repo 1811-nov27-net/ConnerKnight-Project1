@@ -16,7 +16,7 @@ namespace Project0.Library
         public string Name { get ; set ; }
         public decimal Price { get ; set ; }
         public List<Ingredient> RequiredIng { get; set; }
-        public string Size { get; set; }
+        //public string Size { get; set; }
         //public Dictionary<string,decimal> sizePrices { get; set; }
 
 

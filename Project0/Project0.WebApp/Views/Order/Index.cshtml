@@ -1,0 +1,72 @@
+﻿@model IEnumerable<Project0.Library.Order>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderTime)
+            </th>
+            <th>
+                User
+            </th>
+            <th>
+                Location
+            </th>
+            <th>
+                Pizzas
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderTime)
+            </td>
+            <td>
+                @(Html.DisplayFor(modelItem => item.User.FirstName) + " " + Html.DisplayFor(modelItem => item.User.LastName))
+            </td>
+
+            <td>
+                @(Html.DisplayFor(modelItem => item.Location.Name))
+            </td>
+
+            <td>
+                @{bool comma = false;}
+                @foreach (var pair in item.Contents)
+                {
+                    @if (comma)
+                    {
+                        @(", ")
+                    }
+                    @Html.DisplayFor(model => pair.Key.Name)@(" - ")
+                    @Html.DisplayFor(model => pair.Value)
+                    comma = true;
+                }
+            </td>
+
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.OrderId }) |
+                @Html.ActionLink("Details", "Details", new { id = item.OrderId }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.OrderId })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

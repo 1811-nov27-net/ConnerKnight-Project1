@@ -17,9 +17,8 @@ namespace Project0.Library
         //was Dictionary<IVictual,int> had to make List<KeyValuePair<IVictual,int>> for serialization
         public Dictionary<Ingredient, int> Inventory { get; set; }
         //made it so only pizzas could be ordered
-        public List<Pizza> Menu { get; set; }
+        //public List<Pizza> Menu { get; set; }
 
-        //wouldn't even conceivably ever use this constructor, doesn't make sense
         /*
         public Location(string name, Dictionary<Ingredient, int> inventory, List<Pizza> menu ,List<Order> orderHistory)
         {
@@ -30,45 +29,28 @@ namespace Project0.Library
         }
         */
 
-        public Location(string name, Dictionary<Ingredient, int> inventory, List<Pizza> menu)
-        {
-            Name = name;
-            Inventory = inventory;
-            Menu = menu;
-        }
-        public Location(string name, List<Pizza> menu)
-        {
-            Name = name;
-            Menu = menu;
-            Inventory = new Dictionary<Ingredient, int>();
-        }
         public Location(string name, Dictionary<Ingredient, int> inventory)
         {
             Name = name;
-            Menu = new List<Pizza>();
             Inventory = inventory;
         }
         public Location(string name)
         {
             Name = name;
             Inventory = new Dictionary<Ingredient, int>();
-            Menu = new List<Pizza>();
         }
 
-        //not necesary if not using XML
-        //needed for SQL
         public Location()
         {
             Name = null;
             Inventory = new Dictionary<Ingredient, int>();
-            Menu = new List<Pizza>();
         }
         
         /// <summary>
         /// subtracts the ingredients in orderIngredients from the locations ingredients
         /// </summary>
-        /// <param name="o"></param>
-        /// <param name="orderIngredients"></param>
+        /// <param name="o"> the order that is going to be placed on this Location</param>
+        /// <param name="orderIngredients"> the ingredients that the order requires</param>
         public void PlaceOrder(Order o, Dictionary<Ingredient, int> orderIngredients)
         {
             foreach(KeyValuePair<Ingredient,int> pair in orderIngredients)

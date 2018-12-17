@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Project0.Library;
+using Project0.WebApp.Models;
 
 namespace Project0.WebApp.Controllers
 {
@@ -30,24 +31,34 @@ namespace Project0.WebApp.Controllers
         public ActionResult Details(int id)
         {
             Pizza pizza = Repo.GetPizza(id);
-            return View();
+            return View(pizza);
         }
 
         // GET: Pizza/Create
         public ActionResult Create()
         {
-            return View();
+            return View(new PizzaIngredients {
+                Ingredients = Repo.GetIngredients().Select(a => new FilterIngredient{Ingredient = a,Selected=false }).ToList() });
         }
 
         // POST: Pizza/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Pizza pizza)
+        public ActionResult Create(Pizza pizza, List<FilterIngredient> Ingredients)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
+                    List<Ingredient> addedIng = new List<Ingredient>();
+                    foreach(var i in Ingredients)
+                    {
+                        if (i.Selected)
+                        {
+                            addedIng.Add(i.Ingredient);
+                        }
+                    }
+                    pizza.RequiredIng = addedIng;
                     Repo.AddPizza(pizza);
                 }
                 return RedirectToAction(nameof(Index));
@@ -61,18 +72,31 @@ namespace Project0.WebApp.Controllers
         // GET: Pizza/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Pizza pizza = Repo.GetPizza(id);
+            return View(new PizzaIngredients { Pizza = pizza,Ingredients = Repo.GetIngredients().Select(a => new FilterIngredient { Ingredient = a, Selected = false }).ToList()
+            });
         }
 
         // POST: Pizza/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(Pizza pizza, List<FilterIngredient> Ingredients)
         {
             try
             {
-                // TODO: Add update logic here
-
+                if (ModelState.IsValid)
+                {
+                    List<Ingredient> addedIng = new List<Ingredient>();
+                    foreach (var i in Ingredients)
+                    {
+                        if (i.Selected)
+                        {
+                            addedIng.Add(i.Ingredient);
+                        }
+                    }
+                    pizza.RequiredIng = addedIng;
+                    Repo.UpdatePizza(pizza);
+                }
                 return RedirectToAction(nameof(Index));
             }
             catch
