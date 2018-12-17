@@ -24,7 +24,7 @@ namespace Project0.Library
             //checks to make sure there are no more then 12 items in the order and the price does not exceed $500
             //redo this
             
-            else if (o.Price() > 500)
+            else if (o.Price > 500)
             {
                 throw new BadOrderException("price of the order exceeded $500");
             }
@@ -92,12 +92,12 @@ namespace Project0.Library
 
         public static List<Order> CheapestOrderedHistory(List<Order> input)
         {
-            return input.OrderBy(h => h.Price()).ToList();
+            return input.OrderBy(h => h.Price).ToList();
         }
 
         public static List<Order> ExpensiveOrderedHistory(List<Order> input)
         {
-            return input.OrderByDescending(h => h.Price()).ToList();
+            return input.OrderByDescending(h => h.Price).ToList();
         }
     }
 }

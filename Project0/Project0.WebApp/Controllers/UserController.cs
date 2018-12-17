@@ -30,7 +30,31 @@ namespace Project0.WebApp.Controllers
         public ActionResult Details(int id)
         {
             User user = Repo.GetUser(id);
-            return View(user);
+            
+            return View(new UserHistory { User=user,History=Repo.GetUserIdOrderHistory(id) });
+        }
+
+        public ActionResult Order(int id, string sorting)
+        {
+            User user = Repo.GetUser(id);
+            List<Order> orderHistory = Repo.GetUserIdOrderHistory(id);
+            switch (sorting)
+            {
+                case "cheap":
+                    orderHistory = OrderManager.CheapestOrderedHistory(orderHistory);
+                    break;
+                case "expensive":
+                    orderHistory = OrderManager.ExpensiveOrderedHistory(orderHistory);
+                    break;
+                case "latest":
+                    orderHistory = OrderManager.LatestOrderedHistory(orderHistory);
+                    break;
+                case "earliest":
+                    orderHistory = OrderManager.EarliestOrderedHistory(orderHistory);
+                    break;
+            }
+
+            return View("Details",new UserHistory { User = user, History = orderHistory });
         }
 
         // GET: User/Create

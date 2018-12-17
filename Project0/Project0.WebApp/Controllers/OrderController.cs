@@ -37,7 +37,7 @@ namespace Project0.WebApp.Controllers
         {
             return View(new OrderMaster
             {
-                Users = Repo.GetUsers(),
+                Users = Repo.GetUsers().Select(u => new DisplayUser {User=u }).ToList(),
                 Locations = Repo.GetLocations(),
                 Pizzas = Repo.GetPizzas().Select(a => new PizzaMultiple { Pizza = a,Quantity = 0}).ToList()
             });
@@ -46,13 +46,29 @@ namespace Project0.WebApp.Controllers
         // POST: Order/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Order order)
+        public ActionResult Create(OrderMaster orderMaster)
         {
             try
             {
                 if(ModelState.IsValid)
                 {
+                    Dictionary<Pizza, int> pizzas = new Dictionary<Pizza, int>();
+                    List<Pizza> allPizzas = Repo.GetPizzas();
+                    foreach (var i in orderMaster.Pizzas)
+                    {
+                        if (i.Quantity > 0)
+                        {
+                            var temp = allPizzas.First(a => a.PizzaId == i.Pizza.PizzaId);
+                            pizzas[temp] = i.Quantity;
+                        }
+                    }
+                    User user = Repo.GetUser(orderMaster.Order.User.UserId);
+                    Location location = Repo.GetLocation(orderMaster.Order.Location.LocationId);
+                    DateTime orderTime = orderMaster.Order.OrderTime;
+                    Order order = new Order(location, user, orderTime, pizzas);
                     Repo.AddOrder(order);
+                    //location.Inventory = inventory;
+                    //Repo.AddOrder(order);
                 }
 
                 return RedirectToAction(nameof(Index));
@@ -60,11 +76,17 @@ namespace Project0.WebApp.Controllers
             catch(BadOrderException e)
             {
                 //do something with the bad order exception
-                return View();
+                ModelState.AddModelError("Order", e.Message);
+                return View(new OrderMaster {
+                    Order = orderMaster.Order,
+                    Users = Repo.GetUsers().Select(u => new DisplayUser { User = u }).ToList(),
+                    Locations = Repo.GetLocations(),
+                    Pizzas = Repo.GetPizzas().Select(a => new PizzaMultiple { Pizza = a, Quantity = 0 }).ToList()
+                });
             }
             catch
             {
-                return View();
+                return View(orderMaster);
             }
         }
 
@@ -74,13 +96,13 @@ namespace Project0.WebApp.Controllers
         // GET: Order/Delete/5
         public ActionResult Delete(int id)
         {
-            /*
+            
             Order order = Repo.GetOrder(id);
             if(order != null)
             {
-                return View();
+                return View(order);
             }
-            */
+            
 
             return RedirectToAction(nameof(Index));
         }
@@ -93,7 +115,7 @@ namespace Project0.WebApp.Controllers
             try
             {
                 // TODO: Add delete logic here
-
+                Repo.DeleteOrderId(id);
 
                 return RedirectToAction(nameof(Index));
             }

@@ -9,9 +9,15 @@ namespace Project0.WebApp.Models
     public class OrderMaster
     {
         public Order Order { get; set; }
-        public List<User> Users { get; set; }
+        public List<DisplayUser> Users { get; set; }
         public List<Location> Locations { get; set; }
         public List<PizzaMultiple> Pizzas { get; set; }
+    }
+
+    public class DisplayUser
+    {
+        public User User { get; set; }
+        public string FullName { get { return User.FirstName + " " + User.LastName; }}
     }
 
     public class PizzaMultiple

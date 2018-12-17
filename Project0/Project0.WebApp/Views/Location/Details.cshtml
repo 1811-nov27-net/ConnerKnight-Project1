@@ -1,4 +1,4 @@
-﻿@model Project0.Library.Location
+﻿@model Project0.WebApp.Models.LocationHistory
 
 @{
     ViewData["Title"] = "Details";
@@ -11,16 +11,16 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.LocationId)
+            Location Id
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.LocationId)
+            @Html.DisplayFor(model => model.Location.LocationId)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Location.Name)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Location.Name)
         </dd>
 
         <dt class="col-sm-2">
@@ -28,7 +28,7 @@
         </dt>
         <dd class="col-sm-10">
             @{bool comma = false;}
-            @foreach (var pair in Model.Inventory)
+            @foreach (var pair in Model.Location.Inventory)
             {
                 @if (comma)
                 {
@@ -40,8 +40,80 @@
             }
         </dd>
     </dl>
+
+        <h4> Location's History</h4>
+        @Html.ActionLink("Order by Latest ", "Order", new { id = Model.Location.LocationId, sorting = "latest" }) |
+        @Html.ActionLink(" Order by Earliest ", "Order", new { id = Model.Location.LocationId, sorting = "earliest" }) |
+        @Html.ActionLink(" Order by Most Expensive ", "Order", new { id = Model.Location.LocationId, sorting = "expensive" }) |
+        @Html.ActionLink(" Order by Cheapest", "Order", new { id = Model.Location.LocationId, sorting = "cheap" }) |
+
+        <hr />
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Order Id
+                    </th>
+                    <th>
+                        Order Time
+                    </th>
+                    <th>
+                        User
+                    </th>
+                    <th>
+                        Location
+                    </th>
+                    <th>
+                        Pizzas
+                    </th>
+                    <th>
+                        Total Cost
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.History)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OrderId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OrderTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.User.FirstName)  @(" ")  @(Html.DisplayFor(modelItem => item.User.LastName))
+                        </td>
+
+                        <td>
+                            @(Html.DisplayFor(modelItem => item.Location.Name))
+                        </td>
+
+                        <td>
+                            @{comma = false;}
+                            @foreach (var pair in item.Contents)
+                            {
+                                @if (comma)
+                                {
+                                    @(", ")
+                                }
+                                @Html.DisplayFor(model => pair.Key.Name)@(" - ")
+                                @Html.DisplayFor(model => pair.Value)
+                                comma = true;
+                            }
+                        </td>
+
+                        <td>
+                            @(Html.DisplayFor(model => item.Price))
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    @Html.ActionLink("Edit", "Edit", new {  id = Model.Location.LocationId }) |
     <a asp-action="Index">Back to List</a>
 </div>

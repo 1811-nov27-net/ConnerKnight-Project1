@@ -1,0 +1,68 @@
+﻿@model Project0.Library.Order
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Order</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.OrderId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.OrderId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.OrderTime)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.OrderTime)
+        </dd>
+
+
+        <dt class="col-sm-2">
+            User
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.FirstName)  @(" ")  @(Html.DisplayFor(model => model.User.LastName))
+        </dd>
+
+
+        <dt class="col-sm-2">
+            Location
+        </dt>
+        <dd class="col-sm-10">
+            @(Html.DisplayFor(model => model.Location.Name))
+        </dd>
+
+        <dt class="col-sm-2">
+            Pizzas
+        </dt>
+        
+        <dd class="col-sm-10">
+            @{bool comma = false;}
+            @foreach (var pair in Model.Contents)
+            {
+                @if (comma)
+                {
+                    @(", ")
+                }
+                @Html.DisplayFor(model => pair.Key.Name)@(" - ")
+                @Html.DisplayFor(model => pair.Value)
+                comma = true;
+            }
+            </dd>
+        
+
+</dl>
+    
+    <form asp-action="Delete">
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

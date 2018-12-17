@@ -123,6 +123,41 @@ namespace Project0.Tests
 
         }
 
+        [Fact]
+        public void UpdatePizzaWorks()
+        {
+            // arrange
+            var options = new DbContextOptionsBuilder<Project1Context>().UseInMemoryDatabase("update_pizza_test").Options;
+
+            using (var db = new Project1Context(options))
+            {
+                List<Lib.Ingredient> ingredients = new List<Lib.Ingredient> { new Lib.Ingredient { Name = "Orange" }, new Lib.Ingredient { Name = "Grape" } };
+                var repo = new DataRepository(db);
+                repo.AddIngredient(ingredients[0]);
+                repo.AddIngredient(ingredients[1]);
+                Lib.Pizza oldZa = new Lib.Pizza { Name = "Fruit Pizza", Price = 16.99m, RequiredIng = { ingredients[0], ingredients[1] } };
+                repo.AddPizza(oldZa);
+                oldZa.RequiredIng = new List<Lib.Ingredient>{ ingredients[0] };
+                //Lib.Pizza updatedZa = new Lib.Pizza { Name = "Fruit Pizza", Price = 14.49m, RequiredIng = { ingredients[0] } };
+                repo.UpdatePizza(oldZa);
+                db.SaveChanges();
+                Lib.Pizza checkPizza = repo.GetPizza(oldZa.PizzaId);
+                Assert.Equal(2, checkPizza.RequiredIng.Count());
+                Assert.Equal(ingredients[0], checkPizza.RequiredIng[0]);
+                Assert.Equal(ingredients[1], checkPizza.RequiredIng[1]);
+
+            }
+
+            List<Library.Location> locations = new List<Library.Location>();
+            using (var db = new Project1Context(options))
+            {
+                //nothing
+                var repo = new DataRepository(db);
+                locations = repo.GetLocations();
+            }
+
+        }
+
 
     }
 }

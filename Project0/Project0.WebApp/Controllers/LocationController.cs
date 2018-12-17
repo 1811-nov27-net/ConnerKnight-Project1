@@ -28,8 +28,33 @@ namespace Project0.WebApp.Controllers
         public ActionResult Details(int id)
         {
             Location location = Repo.GetLocation(id);
-            return View(location);
+            var history = Repo.GetLocationIdOrderHistory(id);
+            return View(new LocationHistory { Location = location, History = history});
         }
+
+        public ActionResult Order(int id, string sorting)
+        {
+            Location location = Repo.GetLocation(id);
+            List<Order> orderHistory = Repo.GetLocationIdOrderHistory(id);
+            switch (sorting)
+            {
+                case "cheap":
+                    orderHistory = OrderManager.CheapestOrderedHistory(orderHistory);
+                    break;
+                case "expensive":
+                    orderHistory = OrderManager.ExpensiveOrderedHistory(orderHistory);
+                    break;
+                case "latest":
+                    orderHistory = OrderManager.LatestOrderedHistory(orderHistory);
+                    break;
+                case "earliest":
+                    orderHistory = OrderManager.EarliestOrderedHistory(orderHistory);
+                    break;
+            }
+
+            return View("Details", new LocationHistory { Location = location, History = orderHistory });
+        }
+
 
         // GET: Location/Create
         public ActionResult Create()

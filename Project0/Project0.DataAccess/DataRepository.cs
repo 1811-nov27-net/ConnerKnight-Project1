@@ -113,6 +113,7 @@ namespace Project0.DataAccess
             Location l = db.Location.Find(order.Location.LocationId);
             //Console.WriteLine("the real pepperoni" + order.Location.Inventory[order.Location.Inventory.Keys.Where(a => a.Name == "Pepperoni").First()]);
             l.Locationingredient = Mapper.Map(order.Location.Inventory);
+            db.Update(l);
             Order o = new Order() { User = u, Location = l, OrderTime = order.OrderTime};
 
 
@@ -136,7 +137,7 @@ namespace Project0.DataAccess
 
         public Library.User GetUser(int userId)
         {
-            return Mapper.Map(db.User.First(a => a.UserId == userId));
+            return Mapper.Map(db.User.Include(a=>a.DefaultLocation).First(a => a.UserId == userId));
         }
 
         public List<Library.User> GetUsers()

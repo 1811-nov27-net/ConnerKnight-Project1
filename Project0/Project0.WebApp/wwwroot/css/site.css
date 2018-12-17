@@ -44,7 +44,13 @@ html {
 body {
     /* Margin bottom by footer height */
     margin-bottom: 60px;
-    background-color: #f79771;
+    background-color: white;
+}
+.bg-blue {
+    background-color: #0078ae;
+}
+.text-light {
+    color: whitesmoke;
 }
 .footer {
   position: absolute;

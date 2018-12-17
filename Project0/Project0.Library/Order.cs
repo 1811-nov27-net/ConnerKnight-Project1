@@ -13,7 +13,19 @@ namespace Project0.Library
         public DateTime OrderTime { get; set; }
         //made it so you can only order pizzas
         public Dictionary<Pizza,int> Contents { get; set; }
-        //public decimal Price;
+        public decimal Price
+        {
+            get
+            {
+                decimal total = 0.0M;
+                foreach (var pair in Contents)
+                {
+                    total += pair.Key.Price * pair.Value;
+                }
+
+                return total;
+            }
+        }
 
         public Order(Location l, User u, DateTime ot, Dictionary<Pizza,int> c)
         {
@@ -29,6 +41,7 @@ namespace Project0.Library
             Contents = new Dictionary<Pizza, int>();
         }
 
+        /*
         public decimal Price()
         {
             decimal total = 0.0M;
@@ -39,6 +52,7 @@ namespace Project0.Library
 
             return total;
         }
+        */
 
 
         //serializing order is going to break everything
