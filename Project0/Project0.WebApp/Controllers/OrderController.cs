@@ -48,7 +48,7 @@ namespace Project0.WebApp.Controllers
             Order favorite = user.SuggestedOrder(Repo.GetUserOrderHistory(user));
             return View("Create",new OrderMaster
             {
-                Order = new Order { User = user},
+                Order = new Order { User = user, OrderTime = DateTime.Now},
                 Users = Repo.GetUsers().Select(u => new DisplayUser { User = u }).ToList(),
                 Locations = Repo.GetLocations(),
                 Pizzas = Repo.GetPizzas().Select(a => new PizzaMultiple { Pizza = a, Quantity = 0 }).ToList(),

@@ -10,6 +10,7 @@ namespace Project0.WebApp.Models
     {
         public int PizzaId { get; set; }
         [Required]
+        [StringLength(100)]
         public string Name { get; set; }
         [Required]
         [Range(0.0,500.0)]

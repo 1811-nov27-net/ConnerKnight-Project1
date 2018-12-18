@@ -46,6 +46,11 @@ body {
     margin-bottom: 60px;
     background-color: white;
 }
+
+.field-validation-error {
+    color: red !important;
+}
+
 .bg-blue {
     background-color: #0078ae;
 }

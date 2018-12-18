@@ -10,6 +10,7 @@ namespace Project0.WebApp.Models
     {
         public int IngredientId { get; set; }
         [Required]
+        [StringLength(40)]
         public string Name { get; set; }
     }
 }

@@ -383,14 +383,18 @@ namespace Project0.DataAccess
         public bool UpdateLocation(Library.Location location)
         {
             ////_db.Entry(_db.Restaurant.Find(restaurant.Id)).CurrentValues.SetValues(Mapper.Map(restaurant));
-            var temp = db.Location.Find(location.LocationId);
-            if(temp != null)
+            var temp = db.Location.Include("Locationingredient.Ingredient").First(c => c.LocationId == location.LocationId);
+            if (temp != null)
             {
-                db.Entry(temp).CurrentValues.SetValues(getNewLocation(location).LocationId = location.LocationId);
+                Location updated = getNewLocation(location);
+                updated.LocationId = location.LocationId;
+                db.Entry(temp).CurrentValues.SetValues(updated);
                 db.SaveChanges();
                 return true;
             }
             return false;
+
+            
         }
 
         public bool UpdateUser(Library.User user)
@@ -429,7 +433,7 @@ namespace Project0.DataAccess
 
         public bool IngredientNameExists(string name)
         {
-            if(db.Ingredient.First(a => a.Name == name) != null)
+            if(db.Ingredient.Where(a => a.Name == name).Count() > 0)
             {
                 return true;
             }
