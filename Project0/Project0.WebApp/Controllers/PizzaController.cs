@@ -38,19 +38,19 @@ namespace Project0.WebApp.Controllers
         public ActionResult Create()
         {
             return View(new PizzaIngredients {
-                Ingredients = Repo.GetIngredients().Select(a => new FilterIngredient{Ingredient = a,Selected=false }).ToList() });
+                Ingredients = Repo.GetIngredients().Select(a => new FilterIngredient{Ingredient = Mapper.Map(a),Selected=false }).ToList() });
         }
 
         // POST: Pizza/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Pizza pizza, List<FilterIngredient> Ingredients)
+        public ActionResult Create(ModelPizza pizza, List<FilterIngredient> Ingredients)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    List<Ingredient> addedIng = new List<Ingredient>();
+                    List<ModelIngredient> addedIng = new List<ModelIngredient>();
                     foreach(var i in Ingredients)
                     {
                         if (i.Selected)
@@ -59,7 +59,7 @@ namespace Project0.WebApp.Controllers
                         }
                     }
                     pizza.RequiredIng = addedIng;
-                    Repo.AddPizza(pizza);
+                    Repo.AddPizza(Mapper.Map(pizza));
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -73,20 +73,20 @@ namespace Project0.WebApp.Controllers
         public ActionResult Edit(int id)
         {
             Pizza pizza = Repo.GetPizza(id);
-            return View(new PizzaIngredients { Pizza = pizza,Ingredients = Repo.GetIngredients().Select(a => new FilterIngredient { Ingredient = a, Selected = false }).ToList()
+            return View(new PizzaIngredients { Pizza = Mapper.Map(pizza),Ingredients = Repo.GetIngredients().Select(a => new FilterIngredient { Ingredient = Mapper.Map(a), Selected = false }).ToList()
             });
         }
 
         // POST: Pizza/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Pizza pizza, List<FilterIngredient> Ingredients)
+        public ActionResult Edit(ModelPizza pizza, List<FilterIngredient> Ingredients)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    List<Ingredient> addedIng = new List<Ingredient>();
+                    List<ModelIngredient> addedIng = new List<ModelIngredient>();
                     foreach (var i in Ingredients)
                     {
                         if (i.Selected)
@@ -95,7 +95,7 @@ namespace Project0.WebApp.Controllers
                         }
                     }
                     pizza.RequiredIng = addedIng;
-                    Repo.UpdatePizza(pizza);
+                    Repo.UpdatePizza(Mapper.Map(pizza));
                 }
                 return RedirectToAction(nameof(Index));
             }

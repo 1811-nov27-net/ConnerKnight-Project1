@@ -27,6 +27,8 @@ namespace Project0.Library
         bool DeletePizzaId(int pizzaId);
         bool DeleteOrderId(int orderId);
 
+        bool IngredientNameExists(string name);
+
         List<Library.Ingredient> GetIngredients();
         Library.Ingredient GetIngredient(int ingredientId);
         Library.Location GetLocation(int locationId);

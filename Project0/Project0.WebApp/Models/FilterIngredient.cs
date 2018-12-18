@@ -8,7 +8,7 @@ namespace Project0.WebApp.Models
 {
     public class FilterIngredient
     {
-        public Ingredient Ingredient { get; set; }
+        public ModelIngredient Ingredient { get; set; }
         public bool Selected { get; set; }
     }
 }

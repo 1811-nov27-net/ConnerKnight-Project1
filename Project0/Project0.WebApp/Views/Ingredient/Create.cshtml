@@ -1,4 +1,4 @@
-﻿@model Project0.Library.Ingredient
+﻿@model Project0.WebApp.Models.ModelIngredient
 
 @{
     ViewData["Title"] = "Create";
@@ -17,6 +17,10 @@
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("Create"))
+            {
+                <span class="field-validation-error">@ViewData.ModelState["Create"].Errors[0].ErrorMessage</span>
+            }
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

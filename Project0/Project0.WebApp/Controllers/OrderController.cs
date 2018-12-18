@@ -32,11 +32,35 @@ namespace Project0.WebApp.Controllers
             return View();
         }
 
+        public ActionResult LogIn()
+        {
+            return View(new OrderMaster
+            {
+                Users = Repo.GetUsers().Select(u => new DisplayUser { User = u }).ToList()
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult LogIn(OrderMaster orderMaster)
+        {
+            User user = Repo.GetUser(orderMaster.Order.User.UserId);
+            Order favorite = user.SuggestedOrder(Repo.GetUserOrderHistory(user));
+            return View("Create",new OrderMaster
+            {
+                Order = new Order { User = user},
+                Users = Repo.GetUsers().Select(u => new DisplayUser { User = u }).ToList(),
+                Locations = Repo.GetLocations(),
+                Pizzas = Repo.GetPizzas().Select(a => new PizzaMultiple { Pizza = a, Quantity = 0 }).ToList(),
+                Favorite = favorite
+            });
+        }
+
         // GET: Order/Create
         public ActionResult Create()
         {
             return View(new OrderMaster
-            {
+            {   
                 Users = Repo.GetUsers().Select(u => new DisplayUser {User=u }).ToList(),
                 Locations = Repo.GetLocations(),
                 Pizzas = Repo.GetPizzas().Select(a => new PizzaMultiple { Pizza = a,Quantity = 0}).ToList()
@@ -52,21 +76,42 @@ namespace Project0.WebApp.Controllers
             {
                 if(ModelState.IsValid)
                 {
-                    Dictionary<Pizza, int> pizzas = new Dictionary<Pizza, int>();
-                    List<Pizza> allPizzas = Repo.GetPizzas();
-                    foreach (var i in orderMaster.Pizzas)
+                    if (orderMaster.Favorite != null)
                     {
-                        if (i.Quantity > 0)
-                        {
-                            var temp = allPizzas.First(a => a.PizzaId == i.Pizza.PizzaId);
-                            pizzas[temp] = i.Quantity;
-                        }
+                        User u = Repo.GetUser(orderMaster.Order.User.UserId);
+                        List<Order> os = Repo.GetUserOrderHistory(u);
+                        Order chosen = u.SuggestedOrder(os);
+                        chosen.User = u;
+                        Repo.AddOrder(chosen);
                     }
-                    User user = Repo.GetUser(orderMaster.Order.User.UserId);
-                    Location location = Repo.GetLocation(orderMaster.Order.Location.LocationId);
-                    DateTime orderTime = orderMaster.Order.OrderTime;
-                    Order order = new Order(location, user, orderTime, pizzas);
-                    Repo.AddOrder(order);
+                    else
+                    {
+
+                        Dictionary<Pizza, int> pizzas = new Dictionary<Pizza, int>();
+                        List<Pizza> allPizzas = Repo.GetPizzas();
+                        foreach (var i in orderMaster.Pizzas)
+                        {
+                            if (i.Quantity > 0)
+                            {
+                                var temp = allPizzas.First(a => a.PizzaId == i.Pizza.PizzaId);
+                                pizzas[temp] = i.Quantity;
+                            }
+                        }
+                        User user = Repo.GetUser(orderMaster.Order.User.UserId);
+                        Location location;
+                        if (orderMaster.Order.Location.LocationId == -1)
+                        {
+                            location = Repo.GetLocation(orderMaster.Order.User.DefaultLocation.LocationId);
+                        }
+                        else
+                        {
+                            location = Repo.GetLocation(orderMaster.Order.Location.LocationId);
+                        }
+
+                        DateTime orderTime = orderMaster.Order.OrderTime;
+                        Order order = new Order(location, user, orderTime, pizzas);
+                        Repo.AddOrder(order);
+                    }
                     //location.Inventory = inventory;
                     //Repo.AddOrder(order);
                 }
@@ -86,7 +131,13 @@ namespace Project0.WebApp.Controllers
             }
             catch
             {
-                return View(orderMaster);
+                return View(new OrderMaster
+                {
+                    Order = orderMaster.Order,
+                    Users = Repo.GetUsers().Select(u => new DisplayUser { User = u }).ToList(),
+                    Locations = Repo.GetLocations(),
+                    Pizzas = Repo.GetPizzas().Select(a => new PizzaMultiple { Pizza = a, Quantity = 0 }).ToList()
+                });
             }
         }
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Project0.Library;
+using Project0.WebApp.Models;
 
 namespace Project0.WebApp.Controllers
 {
@@ -40,13 +41,21 @@ namespace Project0.WebApp.Controllers
         // POST: Ingredient/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Ingredient ingredient)
+        public ActionResult Create(ModelIngredient ingredient)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    Repo.AddIngredient(ingredient);
+                    if (!Repo.IngredientNameExists(ingredient.Name))
+                    {
+                        Repo.AddIngredient(new Ingredient { Name = ingredient.Name });
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("Create", "ingredient already exists");
+                        return View();
+                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -65,16 +74,17 @@ namespace Project0.WebApp.Controllers
         // POST: Ingredient/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id,Ingredient ingredient)
+        public ActionResult Edit(int id, ModelIngredient ingredient)
         {
             try
             {
                 ingredient.IngredientId = id;
-                if (Repo.UpdateIngredient(ingredient))
+                if (Repo.UpdateIngredient(new Ingredient { Name = ingredient.Name, IngredientId = ingredient.IngredientId}))
                 {
                     return RedirectToAction(nameof(Index));
                 }
                 //if get here then the ingredient wasn't found
+                ModelState.AddModelError("Edit", "ingredient doesnt exist");
                 return View();
 
             }
@@ -93,7 +103,7 @@ namespace Project0.WebApp.Controllers
             {
                 return View(ingredient);
             }
-
+            
             return RedirectToAction(nameof(Index));
         }
 
@@ -105,9 +115,14 @@ namespace Project0.WebApp.Controllers
             try
             {
                 // TODO: Add delete check here
-                Repo.DeleteIngredientId(id);
+                if (Repo.DeleteIngredientId(id))
+                {
+                    return RedirectToAction(nameof(Index));
+                }
 
-                return RedirectToAction(nameof(Index));
+                
+                ModelState.AddModelError("Delete", "ingredient doesnt exist");
+                return View();
             }
             catch
             {

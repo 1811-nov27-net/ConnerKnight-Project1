@@ -66,15 +66,16 @@ namespace Project0.WebApp.Controllers
         // POST: User/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(User user,UserLocation userLocation)
+        public ActionResult Create(ModelUser user,List<Location> locations)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    Location location = Repo.GetLocationByName(userLocation.RawLocation);
-                    user.DefaultLocation = location;
-                    Repo.AddUser(user);
+                    Location location = Repo.GetLocation(user.DefaultLocation.LocationId);
+                    User u = Mapper.Map(user);
+                    u.DefaultLocation = location;
+                    Repo.AddUser(u);
                 }
                 return RedirectToAction(nameof(Index));
             }

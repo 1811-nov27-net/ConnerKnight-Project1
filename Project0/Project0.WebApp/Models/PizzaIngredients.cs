@@ -8,7 +8,7 @@ namespace Project0.WebApp.Models
 {
     public class PizzaIngredients
     {
-        public Pizza Pizza { get; set; }
+        public ModelPizza Pizza { get; set; }
         public List<FilterIngredient> Ingredients { get; set; }
     }
 

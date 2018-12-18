@@ -426,5 +426,14 @@ namespace Project0.DataAccess
             Location temp = db.Location.First(a => a.Name == name);
             return GetLocation(temp.LocationId);
         }
+
+        public bool IngredientNameExists(string name)
+        {
+            if(db.Ingredient.First(a => a.Name == name) != null)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

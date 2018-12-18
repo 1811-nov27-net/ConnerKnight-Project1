@@ -43,7 +43,10 @@
                 </ul>
                 <span asp-validation-for="Pizza.RequiredIng" class="text-danger"></span>
             </div>
-
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("Edit"))
+            {
+                <span class="field-validation-error">@ViewData.ModelState["Edit"].Errors[0].ErrorMessage</span>
+            }
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

@@ -15,11 +15,26 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group">
-                <label asp-for="Order.User" class="control-label"></label>
+                <label asp-for="Order.User.UserId" class="control-label"></label>
+                @Html.DropDownListFor(model => model.Order.User.UserId,
+        new SelectList(Model.Users, "User.UserId", "FullName"), "Select User", "form-control")
+                @*
+        <input asp-for="Order.User.UserId" class="form-control" hidden="hidden" />
+        @Html.DisplayFor(model => model.Order.User.FirstName)
+        @(" ")
+        @Html.DisplayFor(model => model.Order.User.LastName)
+                *@
+
                 @*(IEnumerable items, string dataValueField, string dataTextField)*@
-                @Html.DropDownListFor(model=> model.Order.User.UserId,
-               new SelectList(Model.Users,"User.UserId","FullName"), "Select User", "form-control")
+
+                @*
+                    <p>@( Model.Order.User.FirstName + " " + Model.Order.User.LastName)</p>
+                    <input asp-for="Order." class="form-control" readonly="readonly" />
+                    @Html.DropDownListFor(model => model.Order.User.UserId,
+        new SelectList(Model.Users, "User.UserId", "FullName"), "Select User", "form-control")
+                *@
             </div>
+
             <div class="form-group">
                 <label asp-for="Order.Location" class="control-label"></label>
                 @Html.DropDownListFor(model => model.Order.Location.LocationId,
@@ -30,6 +45,38 @@
                 <input asp-for="Order.OrderTime" class="form-control" />
                 <span asp-validation-for="Order.OrderTime" class="text-danger"></span>
             </div>
+
+
+        @if (Model.Favorite != null)
+        {
+            <h6>
+                @Html.DisplayFor(model => model.Favorite.User.FirstName)  @(" ")  @(Html.DisplayFor(model => model.Favorite.User.LastName))
+            </h6>
+
+            <h6>
+                @(Html.DisplayFor(model => model.Favorite.Location.Name))
+            </h6>
+
+            <h6>
+                @{bool comma = false;}
+                @foreach (var pair in Model.Favorite.Contents)
+                {
+                    @if (comma)
+                    {
+                        @(", ")
+                    }
+                    @Html.DisplayFor(model => pair.Key.Name)@(" - ")
+                    @Html.DisplayFor(model => pair.Value)
+                    comma = true;
+                }
+            </h6>
+
+            <h6>
+                @("$ ")  @Html.DisplayFor(model => model.Favorite.Price)
+            </h6>
+            @Html.ActionLink("Order Favorite", "Create", new OrderMaster { Order = Model.Favorite, Locations = Model.Locations, Pizzas = Model.Pizzas, Users = Model.Users, Favorite = Model.Favorite })
+                    }
+
         </div>
         <div class="col-md-4">
             <div class="form-group">

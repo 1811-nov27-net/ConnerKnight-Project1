@@ -12,6 +12,7 @@ namespace Project0.WebApp.Models
         public List<DisplayUser> Users { get; set; }
         public List<Location> Locations { get; set; }
         public List<PizzaMultiple> Pizzas { get; set; }
+        public Order Favorite { get; set; }
     }
 
     public class DisplayUser

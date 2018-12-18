@@ -61,20 +61,20 @@ namespace Project0.WebApp.Controllers
         {
             return View(new LocationIngredients
             {
-                Ingredients = Repo.GetIngredients().Select(a => new MultipleIngredient { Ingredient = a, Quantity = 0 }).ToList()
+                Ingredients = Repo.GetIngredients().Select(a => new MultipleIngredient { Ingredient = Mapper.Map(a), Quantity = 0 }).ToList()
             });
         }
 
         // POST: Location/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Location location, List<MultipleIngredient> ingredients)
+        public ActionResult Create(ModelLocation location, List<MultipleIngredient> ingredients)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    Dictionary<Ingredient,int> inventory = new Dictionary<Ingredient,int>();
+                    Dictionary<ModelIngredient,int> inventory = new Dictionary<ModelIngredient, int>();
                     foreach (var i in ingredients)
                     {
                         if (i.Quantity > 0)
@@ -83,7 +83,7 @@ namespace Project0.WebApp.Controllers
                         }
                     }
                     location.Inventory = inventory;
-                    Repo.AddLocation(location);
+                    Repo.AddLocation(Mapper.Map(location));
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -96,17 +96,34 @@ namespace Project0.WebApp.Controllers
         // GET: Location/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Location location = Repo.GetLocation(id);
+            return View(new LocationIngredients
+            {
+                Location = Mapper.Map(location),
+                Ingredients = Repo.GetIngredients().Select(a => new MultipleIngredient { Ingredient = Mapper.Map(a), Quantity = 0 }).ToList()
+            });
         }
 
         // POST: Location/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(ModelLocation location, List<MultipleIngredient> ingredients)
         {
             try
             {
-                // TODO: Add update logic here
+                if (ModelState.IsValid)
+                {
+                    Dictionary<ModelIngredient, int> inventory = new Dictionary<ModelIngredient, int>();
+                    foreach (var i in ingredients)
+                    {
+                        if (i.Quantity > 0)
+                        {
+                            inventory[i.Ingredient] = i.Quantity;
+                        }
+                    }
+                    location.Inventory = inventory;
+                    Repo.UpdateLocation(Mapper.Map(location));
+                }
 
                 return RedirectToAction(nameof(Index));
             }
