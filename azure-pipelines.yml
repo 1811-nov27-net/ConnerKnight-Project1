@@ -13,5 +13,17 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet build --configuration $(buildConfiguration)
+- script: |
+    cd Project0
+    dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
+
+- script: |
+    cd Project0
+    dotnet test --configuration $(buildConfiguration)
+  displayName: 'dotnet test $(buildConfiguration)'
+
+- script: |
+    cd Project0
+    dotnet publish Project0.WebApp --configuration $(buildConfiguration) -o ../publish
+  displayName: 'dotnet publish $(buildConfiguration)'
