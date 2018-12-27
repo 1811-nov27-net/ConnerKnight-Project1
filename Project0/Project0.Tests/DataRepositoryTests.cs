@@ -157,7 +157,7 @@ namespace Project0.Tests
             }
 
         }
-
+        /*
         [Fact]
         public void UpdateLocationWorks()
         {
@@ -197,6 +197,7 @@ namespace Project0.Tests
             }
 
         }
+        */
 
 
     }
